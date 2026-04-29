@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate CV Builder</title>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI;}
+
+body{background:#f1f5f9;}
+
+.header{
+  background:#0f172a;
+  color:#fff;er:none;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+/* Layout */
+.container{display:flex;flex-wrap:wrap;}
+
+/* Form */
+.form{
+  width:100%;
+  max-width:400px;
+  background:#fff;
+  padding:20px;
+}
+.form input,.form textarea{
+  width:100%;
+  margin-bottom:10px;
+  padding:10px;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+.form button{
+  width:100%;
+  padding:12px;
+  margin-top:5px;
+  background:#2563eb;
+  color:#fff;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+/* CV */
+.cv{flex:1;padding:20px;display:flex;justify-content:center;}
+.cv-box{
+  width:100%;
+  max-width:800px;
+  display:flex;
+  background:#fff;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* Left */
+.left{
+  width:35%;
+  background:#1e293b;
+  color:#fff;
+  padding:20px;
+}
+.left img{
+  width:120px;height:120px;border-radius:50%;margin-bottom:10px;
+}
+
+/* Right */
+.right{width:65%;padding:20px;}
+.section{margin-bottom:15px;}
+.section h3{
+  border-bottom:2px solid #2563eb;
+  margin-bottom:5px;
+}
+
+/* Mobile */
+@media(max-width:768px){
+  .cv-box{flex-direction:column;}
+  .left,.right{width:100%;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<button onclick="location.reload()">Home</button>
+Ultimate CV Builder
+</div>
+
+<div class="container">
+
+<!-- FORM -->
+<div class="form">
+
+<input type="file" id="photo">
+
+<input type="text" id="name" placeholder="Full Name">
+<input type="text" id="job" placeholder="Job Title">
+<input type="text" id="phone" placeholder="Phone Number">
+<input type="email" id="email" placeholder="Gmail">
+<input type="date" id="dob">
+
+<input type="text" id="country" placeholder="Country">
+<input type="text" id="location" placeholder="Location">
+
+<!-- Passport Option -->
+<label><input type="checkbox" id="showPassport"> Show Passport Details</label>
+
+<input type="text" id="passport" placeholder="Passport Number">
+<input type="date" id="passportExp">
+
+<textarea id="profile" placeholder="Profile"></textarea>
+<textarea id="experience" placeholder="Experience"></textarea>
+<textarea id="projects" placeholder="Projects"></textarea>
+<textarea id="education" placeholder="Education"></textarea>
+<textarea id="skills" placeholder="Skills"></textarea>
+<textarea id="languages" placeholder="Languages"></textarea>
+
+<button onclick="generateCV()">Generate CV</button>
+<button onclick="downloadPDF()">Download PDF</button>
+<button onclick="downloadImage('png')">Download PNG</button>
+<button onclick="downloadImage('jpg')">Download JPG</button>
+
+</div>
+
+<!-- CV -->
+<div class="cv">
+<div class="cv-box" id="cv">
+
+<div class="left">
+
+<img id="cvPhoto" src="https://via.placeholder.com/120">
+
+<h2 id="cvName">Your Name</h2>
+<p id="cvJob"></p>
+
+<p id="cvPhone"></p>
+<p id="cvEmail"></p>
+<p id="cvDOB"></p>
+<p id="cvCountry"></p>
+<p id="cvLocation"></p>
+
+<p id="cvPassport"></p>
+<p id="cvPassportExp"></p>
+
+<div class="section">
+<h3>Skills</h3>
+<p id="cvSkills"></p>
+</div>
+
+<div class="section">
+<h3>Languages</h3>
+<p id="cvLanguages"></p>
+</div>
+
+</div>
+
+<div class="right">
+
+<div class="section">
+<h3>Profile</h3>
+<p id="cvProfile"></p>
+</div>
+
+<div class="section">
+<h3>Experience</h3>
+<p id="cvExperience"></p>
+</div>
+
+<div class="section">
+<h3>Projects</h3>
+<p id="cvProjects"></p>
+</div>
+
+<div class="section">
+<h3>Education</h3>
+<p id="cvEducation"></p>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+function generateCV(){
+  cvName.innerText = name.value;
+  cvJob.innerText = job.value;
+
+  cvPhone.innerText = "📞 " + phone.value;
+  cvEmail.innerText = "📧 " + email.value;
+  cvDOB.innerText = "🎂 " + dob.value;
+  cvCountry.innerText = "🌍 " + country.value;
+  cvLocation.innerText = "📍 " + location.value;
+
+  // Passport condition
+  if(showPassport.checked){
+    cvPassport.innerText = "🛂 " + passport.value;
+    cvPassportExp.innerText = "📅 Exp: " + passportExp.value;
+  } else {
+    cvPassport.innerText = "";
+    cvPassportExp.innerText = "";
+  }
+
+  cvProfile.innerText = profile.value;
+  cvExperience.innerText = experience.value;
+  cvProjects.innerText = projects.value;
+  cvEducation.innerText = education.value;
+  cvSkills.innerText = skills.value;
+  cvLanguages.innerText = languages.value;
+
+  let file = photo.files[0];
+  if(file){
+    let reader = new FileReader();
+    reader.onload = e => cvPhoto.src = e.target.result;
+    reader.readAsDataURL(file);
+  }
+}
+
+/* PDF */
+function downloadPDF(){
+  html2canvas(cv).then(canvas => {
+    const img = canvas.toDataURL("image/png");
+    const pdf = new jspdf.jsPDF('p','mm','a4');
+    pdf.addImage(img, 'PNG', 0, 0, 210, 297);
+    pdf.save("CV.pdf");
+  });
+}
+
+/* Image */
+function downloadImage(type){
+  html2canvas(cv).then(canvas => {
+    let link = document.createElement('a');
+    link.download = "CV."+type;
+    link.href = canvas.toDataURL("image/"+type);
+    link.click();
+  });
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My CV Website</title>
+</head>
+<body>
+
+<h1>Welcome to CV Builder</h1>
+<a href="cv.html">Create CV</a>
+
+</body>
+</html>
+
+</script>
+
+</body>
+</html>
